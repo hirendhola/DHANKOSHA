@@ -11,7 +11,6 @@ Dhankosha is an web based SOLANA crypto wallet
 - [Installation](#installation)
 - [Folder Structure](#folder-structure)
 - [Contributing](#contributing)
-- [License](#license)
 - [Contact](#contact)
 
 ## ✨ Features
@@ -27,7 +26,7 @@ Before you begin, ensure you have met the following requirements:
 - **Node.js** (v18 or higher) - [Download Node.js](https://nodejs.org/)
 - **Git** - [Download Git](https://git-scm.com/)
 
-## 🚀 Installation / Run
+## 🚀 Installation
 
 To get started with Dhankosha, follow these steps:
 
