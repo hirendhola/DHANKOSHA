@@ -1,18 +1,25 @@
 /* eslint-disable react/prop-types */
 import { useState } from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Switch } from "@/components/ui/switch"
 import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
-import { MoonIcon, BellIcon, LockIcon, KeyIcon, Code } from "lucide-react"
+import { MoonIcon, BellIcon, LockIcon, KeyIcon, Code, CopyIcon } from "lucide-react"
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { useToast } from "@/hooks/use-toast"
+import { Toaster } from "@/components/ui/toaster"
 
-export default function Settings({ isDarkMode, setIsDarkMode }) {
+export default function Settings({ isDarkMode, setIsDarkMode, selectedWallet }) {
   const [notifications, setNotifications] = useState(false)
   const [currentPassword, setCurrentPassword] = useState("")
   const [newPassword, setNewPassword] = useState("")
   const [confirmPassword, setConfirmPassword] = useState("")
   const [developerMode, SetDeveloperMode] = useState(true)
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [error, setError] = useState('');
+  const [password, setPassword] = useState('');
+  const { toast } = useToast()
 
   const handleChangePassword = (e) => {
     e.preventDefault()
@@ -26,6 +33,26 @@ export default function Settings({ isDarkMode, setIsDarkMode }) {
     setNewPassword("")
     setConfirmPassword("")
   }
+
+  const confirmPassword_cpy = () => {
+    if (password === localStorage.getItem('password')) {
+      navigator.clipboard.writeText(selectedWallet?.secretPhrase.split(" ").join(","));
+      toast({
+        title: "Copied!!",
+        description: "Secret Phrase copied to clipboard!",
+        duration: 1000
+      })
+      setIsDialogOpen(false);
+      setPassword('');
+      setError('');
+    } else {
+      setError('Incorrect password. Please try again.');
+    }
+  };
+
+  const handleCopy = () => {
+    setIsDialogOpen(true);
+  };
 
   return (
     <div className="space-y-6">
@@ -135,6 +162,57 @@ export default function Settings({ isDarkMode, setIsDarkMode }) {
           </Button>
         </CardContent>
       </Card>
+      <Card>
+        <CardHeader>
+          <CardTitle>Secret Recovery Phrase</CardTitle>
+          <CardDescription>Keep this phrase safe and never share it with anyone</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-3 gap-2 blur-sm hover:blur-none bg transition-all">
+            {selectedWallet?.secretPhrase?.split(' ').map((word, index) => (
+              <div key={index} className="flex items-center justify-center space-x-2 bg-secondary rounded p-2 overflow-hidden">
+                <span className="font-mono text-center  select-none ">{word}</span>
+              </div>
+            ))}
+          </div>
+        </CardContent>
+        <CardFooter>
+          <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+            <DialogTrigger asChild>
+              <Button variant="outline" className="w-full" onClick={handleCopy}>
+                <CopyIcon className="mr-2 h-4 w-4" /> Copy Recovery Phrase
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-[425px] dark">
+              <DialogHeader>
+                <DialogTitle className="text-white">Confirm Password</DialogTitle>
+                <DialogDescription>
+                  Please enter your password to copy the recovery phrase.
+                </DialogDescription>
+              </DialogHeader>
+              <div className="grid gap-4 py-4">
+                <div className="grid grid-cols-4 items-center gap-4">
+                  <Label htmlFor="password" className="text-right text-white">
+                    Password
+                  </Label>
+                  <Input
+                    id="password"
+                    type="password"
+                    className="col-span-3 text-white"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                  />
+                </div>
+                {error && <p className="text-red-500 text-sm">{error}</p>}
+              </div>
+              <DialogFooter>
+                <Button onClick={confirmPassword_cpy}>Confirm</Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
+        </CardFooter>
+      </Card>
+      <Toaster />
     </div>
   )
 }

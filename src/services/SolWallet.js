@@ -20,7 +20,7 @@ export const SOL_createKeyPair = (seed, index) => {
   const keyPair = Keypair.fromSecretKey(secret)
   const extractedPrivateKey = keyPair.secretKey;
   const extractedPrivateKeyBase58 = bs58.encode(extractedPrivateKey);
-  return [keyPair.publicKey.toBase58(), extractedPrivateKeyBase58]
+  return [keyPair.publicKey.toBase58(), extractedPrivateKeyBase58, secret]
 }
 
 // export const  ETH_createKeyPair = (seed, index) => {

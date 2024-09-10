@@ -4,16 +4,14 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
-import { RefreshCwIcon, CopyIcon, ChevronsUp, ChevronsDown, PlusCircleIcon } from "lucide-react";
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
+import { RefreshCwIcon, ChevronsUp, ChevronsDown, PlusCircleIcon } from "lucide-react";
+import { useToast } from "@/hooks/use-toast"
+import { Toaster } from "@/components/ui/toaster"
 
 export default function Dashboard({ wallets, selectedWallet, setSelectedWallet, refreshBalance, createWallet }) {
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
   const [balance, setBalance] = useState(0);
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const { toast } = useToast()
 
   useEffect(() => {
     if (selectedWallet) {
@@ -41,26 +39,16 @@ export default function Dashboard({ wallets, selectedWallet, setSelectedWallet, 
     }
   };
 
-  const handleCopy = () => {
-    setIsDialogOpen(true);
-  };
 
   const copyAdd = () => {
     navigator.clipboard.writeText(selectedWallet?.publicKey);
-    alert("Public Key copied to clipboard!");
+    toast({
+      title: "Copied!!",
+      description: "Public key copied to clipboard!",
+      duration: 1000
+    })
   };
 
-  const confirmPassword = () => {
-    if (password === localStorage.getItem('password')) {
-      navigator.clipboard.writeText(selectedWallet?.secretPhrase.split(" ").join(","));
-      alert("Secret Phrase copied to clipboard!");
-      setIsDialogOpen(false);
-      setPassword('');
-      setError('');
-    } else {
-      setError('Incorrect password. Please try again.');
-    }
-  };
 
   return (
     <div className="space-y-6">
@@ -96,8 +84,8 @@ export default function Dashboard({ wallets, selectedWallet, setSelectedWallet, 
               <CardDescription>Your current balance and wallet details</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="text-5xl font-bold mb-4">
-                {balance.toFixed(2)} <h5 className='text-teal-300 inline shadow-lg text-5xl'>SOL</h5>
+              <div className="text-[5vh] font-bold mb-4">
+                {balance.toFixed(8)} <h5 className='text-teal-300 inline shadow-lg'>SOL</h5>
                 {/* SOL ≈ ${(balance * 100).toFixed(2)} */}
               </div>
               <div className="grid gap-2 max-w-full overflow-hidden">
@@ -122,61 +110,9 @@ export default function Dashboard({ wallets, selectedWallet, setSelectedWallet, 
               </Button>
             </CardFooter>
           </Card>
-          {error && <div className="text-red-500">{error}</div>}
-          <Card>
-            <CardHeader>
-              <CardTitle>Secret Recovery Phrase</CardTitle>
-              <CardDescription>Keep this phrase safe and never share it with anyone</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-3 gap-2">
-                {selectedWallet?.secretPhrase?.split(' ').map((word, index) => (
-                  <div key={index} className="flex items-center justify-center space-x-2 bg-secondary rounded p-2 overflow-hidden">
-                    <span className="font-mono text-center blur-sm select-none">{word}</span>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-            <CardFooter>
-              <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-                <DialogTrigger asChild>
-                  <Button variant="outline" className="w-full" onClick={handleCopy}>
-                    <CopyIcon className="mr-2 h-4 w-4" /> Copy Recovery Phrase
-                  </Button>
-                </DialogTrigger>
-                <DialogContent className="sm:max-w-[425px] dark">
-                  <DialogHeader>
-                    <DialogTitle className="text-white">Confirm Password</DialogTitle>
-                    <DialogDescription>
-                      Please enter your password to copy the recovery phrase.
-                    </DialogDescription>
-                  </DialogHeader>
-                  <div className="grid gap-4 py-4">
-                    <div className="grid grid-cols-4 items-center gap-4">
-                      <Label htmlFor="password" className="text-right text-white">
-                        Password
-                      </Label>
-                      <Input
-                        id="password"
-                        type="password"
-                        className="col-span-3 text-white"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                      />
-                    </div>
-                    {error && <p className="text-red-500 text-sm">{error}</p>}
-                  </div>
-                  <DialogFooter>
-                    <Button onClick={confirmPassword}>Confirm</Button>
-                  </DialogFooter>
-                </DialogContent>
-              </Dialog>
-            </CardFooter>
-          </Card>
         </>
       )}
-
-
+      <Toaster />
     </div>
   );
 }

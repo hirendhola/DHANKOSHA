@@ -148,7 +148,7 @@ export default function App() {
       case "history":
         return <History />
       case "settings":
-        return <Settings isDarkMode={isDarkMode} setIsDarkMode={setIsDarkMode} />
+        return <Settings isDarkMode={isDarkMode} setIsDarkMode={setIsDarkMode} selectedWallet={selectedWallet} />
       default:
         return null
     }
@@ -156,7 +156,7 @@ export default function App() {
 
   return (
     <div className={`min-h-screen min-w-screen bg-background ${isDarkMode ? 'dark' : 'light'}`}>
-      <div className="container mx-auto sm:px-18 p-4">
+      <div className="container mx-auto sm:px-24 p-4">
         <Card className="border-none shadow-none">
           <DevnetBanner />
           <CardContent className="p-0">
